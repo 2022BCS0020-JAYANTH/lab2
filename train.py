@@ -3,7 +3,9 @@ import json
 import joblib
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import Ridge
+from sklearn.pipeline import Pipeline
 from sklearn.metrics import mean_squared_error, r2_score
 
 DATA_PATH = "dataset/winequality-red.csv"
@@ -18,10 +20,12 @@ df = pd.read_csv(DATA_PATH, sep=";")
 X = df.drop("quality", axis=1)
 y = df["quality"]
 
-y_bins = pd.qcut(y, q=5, labels=False, duplicates="drop")
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, stratify=y_bins, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-model = LinearRegression()
+model = Pipeline([
+    ("scaler", StandardScaler()),
+    ("ridge", Ridge(alpha=1.0))
+])
 model.fit(X_train, y_train)
 
 pred = model.predict(X_test)
@@ -35,18 +39,19 @@ print(f"R2 Score: {r2}")
 joblib.dump(model, MODEL_PATH)
 
 results = {
-    "experiment_id": "EXP-03",
-    "model": "Linear Regression",
-    "hyperparameters": "Default",
-    "preprocessing": "None",
-    "feature_selection": "All",
-    "split": "75/25 (Stratified)",
+    "experiment_id": "EXP-04",
+    "model": "Ridge Regression",
+    "hyperparameters": "alpha=1.0",
+    "preprocessing": "Standardization",
+    "feature_selection": "Correlation-based",
+    "split": "80/20",
     "mse": mse,
     "r2_score": r2
 }
 
 with open(RESULTS_PATH, "w") as f:
     json.dump(results, f, indent=4)
+
 
 
 
