@@ -17,15 +17,9 @@ df = pd.read_csv(DATA_PATH, sep=";")
 X = df.drop("quality", axis=1)
 y = df["quality"]
 
-prelim_model = RandomForestRegressor(n_estimators=100, random_state=42)
-prelim_model.fit(X, y)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4, random_state=42)
 
-important_features = X.columns[prelim_model.feature_importances_.argsort()[-6:]]
-X_imp = X[important_features]
-
-X_train, X_test, y_train, y_test = train_test_split(X_imp, y, test_size=0.2, random_state=42)
-
-model = RandomForestRegressor(n_estimators=100, max_depth=15, random_state=42)
+model = RandomForestRegressor(n_estimators=100, max_depth=12, random_state=42)
 model.fit(X_train, y_train)
 
 pred = model.predict(X_test)
@@ -39,18 +33,19 @@ print(f"R2 Score: {r2}")
 joblib.dump(model, MODEL_PATH)
 
 results = {
-    "experiment_id": "EXP-06",
+    "experiment_id": "EXP-07",
     "model": "Random Forest",
-    "hyperparameters": "100 trees, depth=15",
+    "hyperparameters": "100 trees, depth=12",
     "preprocessing": "None",
-    "feature_selection": "Importance-based",
-    "split": "80/20",
+    "feature_selection": "All",
+    "split": "60/40",
     "mse": mse,
     "r2_score": r2
 }
 
 with open(RESULTS_PATH, "w") as f:
     json.dump(results, f, indent=4)
+
 
 
 
