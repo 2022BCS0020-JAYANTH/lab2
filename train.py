@@ -3,7 +3,8 @@ import json
 import joblib
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error, r2_score
 
 DATA_PATH = "dataset/winequality-red.csv"
@@ -14,13 +15,18 @@ RESULTS_PATH = os.path.join(OUTPUT_DIR, "results.json")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 df = pd.read_csv(DATA_PATH, sep=";")
-
-X = df.drop("quality", axis=1)
 y = df["quality"]
+
+corr_features = df.corr()["quality"].abs().sort_values(ascending=False).index[1:7]
+X = df[corr_features]
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-model = RandomForestRegressor(n_estimators=100, max_depth=15, random_state=42)
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+model = Ridge(alpha=1.0)
 model.fit(X_train, y_train)
 
 pred = model.predict(X_test)
@@ -34,11 +40,11 @@ print(f"R2 Score: {r2}")
 joblib.dump(model, MODEL_PATH)
 
 results = {
-    "experiment_id": "EXP-06",
-    "model": "Random Forest",
-    "hyperparameters": "100 trees, depth=15",
-    "preprocessing": "None",
-    "feature_selection": "Importance-based",
+    "experiment_id": "EXP-04",
+    "model": "Ridge Regression",
+    "hyperparameters": "alpha=1.0",
+    "preprocessing": "Standardization",
+    "feature_selection": "Correlation-based",
     "split": "80/20",
     "mse": mse,
     "r2_score": r2
@@ -46,6 +52,7 @@ results = {
 
 with open(RESULTS_PATH, "w") as f:
     json.dump(results, f, indent=4)
+
 
 
 
