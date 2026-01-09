@@ -3,9 +3,7 @@ import json
 import joblib
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import Ridge
-from sklearn.pipeline import Pipeline
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, r2_score
 
 DATA_PATH = "dataset/winequality-red.csv"
@@ -22,10 +20,7 @@ y = df["quality"]
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-model = Pipeline([
-    ("scaler", StandardScaler()),
-    ("ridge", Ridge(alpha=1.0))
-])
+model = RandomForestRegressor(n_estimators=50, max_depth=10, random_state=42)
 model.fit(X_train, y_train)
 
 pred = model.predict(X_test)
@@ -39,11 +34,11 @@ print(f"R2 Score: {r2}")
 joblib.dump(model, MODEL_PATH)
 
 results = {
-    "experiment_id": "EXP-04",
-    "model": "Ridge Regression",
-    "hyperparameters": "alpha=1.0",
-    "preprocessing": "Standardization",
-    "feature_selection": "Correlation-based",
+    "experiment_id": "EXP-05",
+    "model": "Random Forest",
+    "hyperparameters": "50 trees, depth=10",
+    "preprocessing": "None",
+    "feature_selection": "All",
     "split": "80/20",
     "mse": mse,
     "r2_score": r2
@@ -57,6 +52,7 @@ with open(RESULTS_PATH, "w") as f:
 
 
 
+# # task 2 code
 # import os
 # import json
 # import joblib
