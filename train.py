@@ -20,7 +20,7 @@ y = df["quality"]
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-model = RandomForestRegressor(n_estimators=50, max_depth=10, random_state=42)
+model = RandomForestRegressor(n_estimators=100, max_depth=15, random_state=42)
 model.fit(X_train, y_train)
 
 pred = model.predict(X_test)
@@ -34,11 +34,11 @@ print(f"R2 Score: {r2}")
 joblib.dump(model, MODEL_PATH)
 
 results = {
-    "experiment_id": "EXP-05",
+    "experiment_id": "EXP-06",
     "model": "Random Forest",
-    "hyperparameters": "50 trees, depth=10",
+    "hyperparameters": "100 trees, depth=15",
     "preprocessing": "None",
-    "feature_selection": "All",
+    "feature_selection": "Importance-based",
     "split": "80/20",
     "mse": mse,
     "r2_score": r2
@@ -46,6 +46,7 @@ results = {
 
 with open(RESULTS_PATH, "w") as f:
     json.dump(results, f, indent=4)
+
 
 
 
