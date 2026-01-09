@@ -17,9 +17,10 @@ df = pd.read_csv(DATA_PATH, sep=";")
 X = df.drop("quality", axis=1)
 y = df["quality"]
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4, random_state=42)
+y_bins = pd.qcut(y, q=5, labels=False, duplicates="drop")
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, stratify=y_bins, random_state=42)
 
-model = RandomForestRegressor(n_estimators=100, max_depth=12, random_state=42)
+model = RandomForestRegressor(n_estimators=150, max_depth=15, random_state=42)
 model.fit(X_train, y_train)
 
 pred = model.predict(X_test)
@@ -33,18 +34,19 @@ print(f"R2 Score: {r2}")
 joblib.dump(model, MODEL_PATH)
 
 results = {
-    "experiment_id": "EXP-07",
+    "experiment_id": "EXP-08",
     "model": "Random Forest",
-    "hyperparameters": "100 trees, depth=12",
+    "hyperparameters": "150 trees, depth=15",
     "preprocessing": "None",
     "feature_selection": "All",
-    "split": "60/40",
+    "split": "75/25 (Stratified)",
     "mse": mse,
     "r2_score": r2
 }
 
 with open(RESULTS_PATH, "w") as f:
     json.dump(results, f, indent=4)
+
 
 
 
