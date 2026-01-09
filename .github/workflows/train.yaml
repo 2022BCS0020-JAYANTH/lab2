@@ -40,8 +40,15 @@ jobs:
         cat outputs/results.json >> $GITHUB_STEP_SUMMARY
         echo '```' >> $GITHUB_STEP_SUMMARY
 
-    - name: Upload artifacts
+    - name: Upload trained model
       uses: actions/upload-artifact@v4
       with:
-        name: model-and-results
-        path: outputs/
+        name: trained-model
+        path: outputs/model.joblib
+
+    - name: Upload evaluation results
+      uses: actions/upload-artifact@v4
+      with:
+        name: evaluation-results
+        path: outputs/results.json
+
